@@ -2,12 +2,19 @@ import React from 'react';
 import SearchBar from './SearchBar';
 import youtube from '../apis/youtube';
 import VideoList from './VideoList'
+import VideoDetails from './VideoDetails'
 const KEY = 'AIzaSyBki6mlFvCAeCXgU_NHzxaUdpyi1cxUKwk';
 
 
 class App extends React.Component {
     state = {
-        videos: []
+        videos: [],
+        selectedVideo: null
+    }
+
+    componentDidMount() {
+        // to have a default search
+        this.onTermSubmit('react js')
     }
 
     onTermSubmit = async inputSearch => {
@@ -21,19 +28,34 @@ class App extends React.Component {
         });
 
         this.setState({
-            videos: response.data.items
+            videos: response.data.items,
+            selectedVideo: response.data.items[0]
         });
     };
 
-    render() {
+    onVideoSelect = video => {
+        this.setState({
+            selectedVideo: video
+        })
+    }
 
+    render() {
         return (
             <div className="ui container">
                 <SearchBar onFormSubmit={this.onTermSubmit} />
-                I do have {this.state.videos.length} suggestion videos for you.!
-                <VideoList videos={this.state.videos} />
+                <div className="ui grid">
+                    <div className="ui row">
+                        <div className="eleven wide column">
+                            <VideoDetails video={this.state.selectedVideo} />
+                        </div>
+                        <div className="five wide column">
+                            <VideoList onVideoSelect={this.onVideoSelect}
+                                videos={this.state.videos} />
+                        </div>
+                    </div>
+                </div>
             </div>
-        )
+        );
     }
 }
 export default App;
